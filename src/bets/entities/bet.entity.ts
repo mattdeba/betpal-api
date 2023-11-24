@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('bets')
 export class Bet {
@@ -13,4 +14,10 @@ export class Bet {
 
   @Column({ nullable: true })
   target: number;
+
+  @ManyToOne(() => User, (user) => user.betsCreated)
+  createdBy: User;
+
+  @ManyToOne(() => User, (user) => user.betsAccepted)
+  acceptedBy: User;
 }

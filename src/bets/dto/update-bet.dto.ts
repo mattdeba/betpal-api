@@ -1,4 +1,5 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateBetDto } from './create-bet.dto';
-
-export class UpdateBetDto extends PartialType(CreateBetDto) {}
+export class UpdateBetDto {
+  readonly assertion: string;
+  readonly amount: number;
+  readonly target: number;
+}

@@ -16,11 +16,22 @@ export class UsersService {
   }
 
   findAll() {
-    return this.usersRepository.find();
+    return this.usersRepository.find({
+      relations: {
+        betsCreated: true,
+        betsAccepted: true,
+      },
+    });
   }
 
   findOne(id: number) {
-    return this.usersRepository.findOne({ where: { id } });
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: {
+        betsCreated: true,
+        betsAccepted: true,
+      },
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

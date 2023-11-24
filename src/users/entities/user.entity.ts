@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Bet } from "../../bets/entities/bet.entity";
 
 @Entity('users')
 export class User {
@@ -13,4 +14,10 @@ export class User {
 
   @Column({ nullable: true })
   email: string;
+
+  @OneToMany(() => Bet, (bet) => bet.createdBy)
+  betsCreated: Bet[];
+
+  @OneToMany(() => Bet, (bet) => bet.acceptedBy)
+  betsAccepted: Bet[];
 }
