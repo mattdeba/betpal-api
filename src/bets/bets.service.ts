@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from "@nestjs/common";
 import { CreateBetDto } from './dto/create-bet.dto';
 import { UpdateBetDto } from './dto/update-bet.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Bet } from './entities/bet.entity';
-import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
@@ -64,5 +63,30 @@ export class BetsService {
 
   remove(id: number) {
     return this.betsRepository.delete(id);
+  }
+
+  async acceptBet(id: number, acceptorEmail: string) {
+    const bet = await this.betsRepository.findOne({
+      where: { id },
+      relations: { acceptedBy: true },
+    });
+    if (!bet) {
+      throw new HttpException('Bet not found', 404);
+    }
+    console.log(bet.acceptedBy);
+    if (bet.acceptedBy) {
+      throw new HttpException('Bet already accepted', 400);
+    }
+    const user = await this.usersRepository.findOne({
+      where: {
+        email: acceptorEmail,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+    return this.betsRepository.update(id, {
+      acceptedBy: user,
+    });
   }
 }

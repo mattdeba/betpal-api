@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { BetsService } from './bets.service';
 import { CreateBetDto } from './dto/create-bet.dto';
 import { UpdateBetDto } from './dto/update-bet.dto';
+import { AcceptBetDto } from './dto/accept-bet.dto';
 
 @Controller('bets')
 export class BetsController {
@@ -30,5 +31,10 @@ export class BetsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.betsService.remove(+id);
+  }
+
+  @Post(':id/accept')
+  async acceptBet(@Param('id') id: string, @Body() acceptBetDto: AcceptBetDto) {
+    return await this.betsService.acceptBet(+id, acceptBetDto?.acceptorEmail);
   }
 }
