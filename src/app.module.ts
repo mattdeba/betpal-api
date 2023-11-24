@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { BetsModule } from './bets/bets.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
+import { IamModule } from './iam/iam.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
       synchronize: true, // your entities will be synced with the database(recommended: disable in prod)
     }),
     UsersModule,
+    IamModule,
   ],
   controllers: [AppController],
   providers: [AppService],
