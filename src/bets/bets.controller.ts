@@ -3,6 +3,7 @@ import { BetsService } from './bets.service';
 import { CreateBetDto } from './dto/create-bet.dto';
 import { UpdateBetDto } from './dto/update-bet.dto';
 import { AcceptBetDto } from './dto/accept-bet.dto';
+import { AssertBetDto } from "./dto/assert-bet.dto";
 
 @Controller('bets')
 export class BetsController {
@@ -36,5 +37,15 @@ export class BetsController {
   @Post(':id/accept')
   async acceptBet(@Param('id') id: string, @Body() acceptBetDto: AcceptBetDto) {
     return await this.betsService.acceptBet(+id, acceptBetDto?.acceptorEmail);
+  }
+
+  @Post(':id/assert')
+  async assertBet(@Param('id') id: string, @Body() assertionDto: AssertBetDto) {
+    return await this.betsService.assertBet(+id, assertionDto.assertionCorrect);
+  }
+
+  @Post(':id/close')
+  async closeBet(@Param('id') id: string) {
+    return await this.betsService.closeBet(+id);
   }
 }

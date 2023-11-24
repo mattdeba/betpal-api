@@ -20,4 +20,10 @@ export class Bet {
 
   @ManyToOne(() => User, (user) => user.betsAccepted)
   acceptedBy: User;
+
+  @Column({ nullable: true })
+  assertionCorrect: boolean;
+
+  @Column({ nullable: true })
+  closed: boolean;
 }

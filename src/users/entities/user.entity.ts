@@ -1,5 +1,5 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Bet } from "../../bets/entities/bet.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Bet } from '../../bets/entities/bet.entity';
 
 @Entity('users')
 export class User {
@@ -20,4 +20,7 @@ export class User {
 
   @OneToMany(() => Bet, (bet) => bet.acceptedBy)
   betsAccepted: Bet[];
+
+  @Column({ nullable: true, default: 100 })
+  points: number;
 }
