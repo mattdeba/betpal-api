@@ -43,6 +43,19 @@ export class BetsService {
     });
   }
 
+  findAllFromFirstName(firstName: string) {
+    return this.betsRepository
+      .createQueryBuilder('bet')
+      .innerJoinAndSelect(
+        'bet.createdBy',
+        'user',
+        'user.firstName = :firstName',
+        { firstName },
+      )
+      .leftJoinAndSelect('bet.acceptedBy', 'acceptedBy')
+      .getMany();
+  }
+
   findOne(id: number) {
     return this.betsRepository.findOne({
       where: { id },

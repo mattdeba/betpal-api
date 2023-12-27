@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from "@nestjs/common";
 import { BetsService } from './bets.service';
 import { CreateBetDto } from './dto/create-bet.dto';
 import { UpdateBetDto } from './dto/update-bet.dto';
 import { AcceptBetDto } from './dto/accept-bet.dto';
-import { AssertBetDto } from "./dto/assert-bet.dto";
+import { AssertBetDto } from './dto/assert-bet.dto';
 
 @Controller('bets')
 export class BetsController {
@@ -15,7 +15,10 @@ export class BetsController {
   }
 
   @Get()
-  findAll() {
+  findAll(@Query('firstName') firstName: string) {
+    if (firstName) {
+      return this.betsService.findAllFromFirstName(firstName);
+    }
     return this.betsService.findAll();
   }
 
