@@ -1,5 +1,13 @@
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+
 export class UpdateBetDto {
-  readonly assertion: string;
-  readonly amount: number;
-  readonly target: number;
+  @IsString()
+  @IsOptional()
+  readonly assertion?: string;
+  @IsNumber()
+  @IsOptional()
+  readonly amount?: number;
+  @IsNumber()
+  @IsOptional()
+  readonly target?: number;
 }
