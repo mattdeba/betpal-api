@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Bet } from './entities/bet.entity';
 import { User } from '../users/entities/user.entity';
+import { Game } from '../games/entities/game.entity';
 
 @Injectable()
 export class BetsService {
@@ -13,8 +14,16 @@ export class BetsService {
     private betsRepository: Repository<Bet>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Game)
+    private gamesRepository: Repository<Game>,
   ) {}
   async create(createBetDto: CreateBetDto) {
+    const game = await this.gamesRepository.findOne({
+      where: { id: createBetDto.gameId },
+    });
+    if (!game) {
+      throw new Error('Game not found');
+    }
     const user = await this.usersRepository.findOne({
       where: {
         email: createBetDto.creatorEmail,
@@ -31,6 +40,8 @@ export class BetsService {
       amount: createBetDto.amount,
       target: createBetDto.target,
       createdBy: user,
+      game: game,
+      homeTeamWinner: createBetDto.homeTeamWinner,
     });
   }
 

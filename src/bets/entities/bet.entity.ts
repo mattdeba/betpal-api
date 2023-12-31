@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Game } from '../../games/entities/game.entity';
 
 @Entity('bets')
 export class Bet {
@@ -20,6 +21,12 @@ export class Bet {
 
   @ManyToOne(() => User, (user) => user.betsAccepted)
   acceptedBy: User;
+
+  @ManyToOne(() => Game)
+  game: Game;
+
+  @Column({ nullable: true })
+  homeTeamWinner: boolean;
 
   @Column({ nullable: true })
   assertionCorrect: boolean;

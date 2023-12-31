@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsNumber, IsString } from 'class-validator';
 
 export class CreateBetDto {
   @IsString()
@@ -9,4 +9,8 @@ export class CreateBetDto {
   readonly target: number;
   @IsEmail()
   readonly creatorEmail: string;
+  @IsNumber()
+  readonly gameId: number;
+  @IsBoolean()
+  readonly homeTeamWinner: boolean;
 }
