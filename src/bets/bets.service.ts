@@ -67,17 +67,42 @@ export class BetsService {
   }
 
   async update(id: number, updateBetDto: UpdateBetDto) {
-    const bet = await this.betsRepository.findOne({ where: { id } });
+    const bet = await this.betsRepository.findOne({
+      where: { id },
+      relations: { createdBy: true },
+    });
     if (!bet) {
       throw new Error('Bet not found');
     }
     if (bet.acceptedBy) {
       throw new Error('Bet already accepted');
     }
+    if (
+      updateBetDto.amount !== undefined &&
+      updateBetDto.amount !== bet.amount
+    ) {
+      const user = bet.createdBy;
+      await this.usersRepository.update(user.id, {
+        points: user.points + bet.amount - updateBetDto.amount,
+      });
+    }
     return this.betsRepository.update(id, updateBetDto);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const bet = await this.betsRepository.findOne({
+      where: { id },
+      relations: { createdBy: true },
+    });
+    if (!bet) {
+      throw new Error('Bet not found');
+    }
+    if (bet.acceptedBy) {
+      throw new Error('Bet already accepted');
+    }
+    await this.usersRepository.update(bet.createdBy.id, {
+      points: bet.createdBy.points + bet.amount,
+    });
     return this.betsRepository.delete(id);
   }
 
