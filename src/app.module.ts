@@ -26,6 +26,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         database: configService.get('DATABASE_NAME', 'betpal'),
         autoLoadEntities: true,
         synchronize: true,
+        options: {
+          encrypt: false,
+        },
       }),
     }),
   ],
