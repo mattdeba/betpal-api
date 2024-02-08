@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,8 +26,14 @@ export class GamesService {
     return `This action returns a #${id} game`;
   }
 
-  update(id: number, updateGameDto: UpdateGameDto) {
-    return `This action updates a #${id} game`;
+  async update(id: number, updateGameDto: UpdateGameDto) {
+    const game = await this.gamesRepository.findOne({ where: { id } });
+    if (!game) {
+      throw new HttpException('Game not found', HttpStatus.NOT_FOUND);
+    }
+    const updatedGame = this.gamesRepository.merge(game, updateGameDto);
+    await this.gamesRepository.save(updatedGame);
+    return updatedGame;
   }
 
   remove(id: number) {
