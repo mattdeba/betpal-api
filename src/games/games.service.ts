@@ -19,7 +19,7 @@ export class GamesService {
   }
 
   findAll() {
-    return `This action returns all games`;
+    return this.gamesRepository.find();
   }
 
   findOne(id: number) {
