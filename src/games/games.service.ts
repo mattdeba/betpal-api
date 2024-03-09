@@ -3,7 +3,7 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './entities/game.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -82,6 +82,40 @@ export class GamesService {
         });
         await this.gamesRepository.save(newGame);
       }
+    }
+  }
+
+  @Cron(CronExpression.EVERY_5_MINUTES, {
+    timeZone: 'Etc/UTC',
+  })
+  async updateScores() {
+    const now = new Date();
+    const threeHoursBefore = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+
+    const games = await this.gamesRepository.find({
+      where: {
+        dateTimeUTC: Between(threeHoursBefore, now),
+      },
+    });
+
+    for (const game of games) {
+      const res = await this.httpService.axiosRef.get(
+        `https://api.sportsdata.io/v3/nba/pbp/json/PlayByPlay/${game.gameId}`,
+        {
+          headers: {
+            'Ocp-Apim-Subscription-Key':
+              this.configService.get('SUBSCRIPTION_KEY'),
+          },
+        },
+      );
+
+      const gameFromApi = res.data.Game;
+      game.homeTeamScore = gameFromApi.HomeTeamScore;
+      game.awayTeamScore = gameFromApi.AwayTeamScore;
+      game.gameStatus = gameFromApi.Status;
+      game.isClosed = gameFromApi.IsClosed;
+
+      await this.gamesRepository.save(game);
     }
   }
 }
