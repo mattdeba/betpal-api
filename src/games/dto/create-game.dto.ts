@@ -32,6 +32,14 @@ export class CreateGameDto {
   @IsNumber()
   awayTeamScore: number;
 
+  @IsOptional()
+  @IsNumber()
+  gameId: number;
+
+  @IsOptional()
+  @IsString()
+  gameStatus: string;
+
   constructor() {
     this.isClosed = false;
     this.homeTeamScore = null;

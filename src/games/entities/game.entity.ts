@@ -5,6 +5,9 @@ export class Game {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ unique: true })
+  gameId: number;
+
   @Column()
   homeTeam: string;
 
@@ -22,4 +25,7 @@ export class Game {
 
   @Column({ nullable: true })
   awayTeamScore: number;
+
+  @Column({ nullable: true })
+  gameStatus: string;
 }

@@ -7,9 +7,11 @@ import { UsersModule } from './users/users.module';
 import { IamModule } from './iam/iam.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GamesModule } from './games/games.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true, // Rendre le module Config global
     }),
