@@ -39,4 +39,13 @@ export class GamesController {
   remove(@Param('id') id: string) {
     return this.gamesService.remove(+id);
   }
+
+  @Post('trigger/updateScores')
+  triggerUpdateScores() {
+    return this.gamesService.updateScores({ updateAllGames: true });
+  }
+  @Post('trigger/updateGames')
+  triggerUpdateGames() {
+    return this.gamesService.updateGames();
+  }
 }

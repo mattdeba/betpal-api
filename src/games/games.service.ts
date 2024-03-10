@@ -3,7 +3,7 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './entities/game.entity';
-import { Between, Repository } from 'typeorm';
+import { Between, Not, Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -48,7 +48,7 @@ export class GamesService {
   @Cron(CronExpression.EVERY_DAY_AT_11AM, {
     timeZone: 'Etc/UTC',
   })
-  async handleCron() {
+  async updateGames() {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -88,15 +88,26 @@ export class GamesService {
   @Cron(CronExpression.EVERY_5_MINUTES, {
     timeZone: 'Etc/UTC',
   })
-  async updateScores() {
-    const now = new Date();
-    const threeHoursBefore = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+  async updateScores(options = { updateAllGames: false }) {
+    const { updateAllGames } = options;
+    let games: any;
 
-    const games = await this.gamesRepository.find({
-      where: {
-        dateTimeUTC: Between(threeHoursBefore, now),
-      },
-    });
+    if (updateAllGames === true) {
+      games = await this.gamesRepository.find({
+        where: {
+          isClosed: Not(true),
+        },
+      });
+    } else {
+      const now = new Date();
+      const threeHoursBefore = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+      games = await this.gamesRepository.find({
+        where: {
+          dateTimeUTC: Between(threeHoursBefore, now),
+          isClosed: Not(true),
+        },
+      });
+    }
 
     for (const game of games) {
       const res = await this.httpService.axiosRef.get(
