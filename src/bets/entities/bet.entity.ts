@@ -10,10 +10,10 @@ export class Bet {
   @Column({ nullable: true })
   assertion: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'double precision', nullable: true })
   amount: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'double precision', nullable: true })
   target: number;
 
   @ManyToOne(() => User, (user) => user.betsCreated)

@@ -7,6 +7,7 @@ import { Between, Not, Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { format } from 'date-fns';
 
 @Injectable()
 export class GamesService {
@@ -49,36 +50,34 @@ export class GamesService {
     timeZone: 'Etc/UTC',
   })
   async updateGames() {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const res = await this.httpService.axiosRef.get(
-      `https://api.sportsdata.io/v3/nba/scores/json/GamesByDate/${year}-${month}-${day}`,
-      {
-        headers: {
-          'Ocp-Apim-Subscription-Key':
-            this.configService.get('SUBSCRIPTION_KEY'),
-        },
+    const date = format(new Date(), 'd/M/yyyy');
+    const url = `https://basketapi1.p.rapidapi.com/api/basketball/matches/${date}`;
+    const key = this.configService.get('RAPIDAPI_KEY');
+    const res = await this.httpService.axiosRef.get(url, {
+      headers: {
+        'X-RapidAPI-Key': key,
+        'X-RapidAPI-Host': 'basketapi1.p.rapidapi.com',
       },
+    });
+    const gamesFromApi = res.data.events.filter(
+      (event) => event.tournament.slug === 'nba',
     );
-    const gamesFromApi = res.data;
     for (const game of gamesFromApi) {
       const existingGame = await this.gamesRepository.findOne({
         where: {
-          gameId: game.GameID,
+          gameId: game.id,
         },
       });
       if (!existingGame) {
         const newGame = this.gamesRepository.create({
-          gameId: game.GameID,
-          gameStatus: game.Status,
-          homeTeam: game.HomeTeam,
-          awayTeam: game.AwayTeam,
-          dateTimeUTC: game.DateTimeUTC,
+          gameId: game.id,
+          gameStatus: game.status.type,
+          homeTeam: game.homeTeam.nameCode,
+          awayTeam: game.awayTeam.nameCode,
+          dateTimeUTC: new Date(game.startTimestamp * 1000).toISOString(),
           isClosed: game.IsClosed,
-          homeTeamScore: game.HomeTeamScore,
-          awayTeamScore: game.AwayTeamScore,
+          homeTeamScore: game.homeScore?.current || null,
+          awayTeamScore: game.awayScore?.current || null,
         });
         await this.gamesRepository.save(newGame);
       }

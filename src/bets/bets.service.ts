@@ -118,6 +118,7 @@ export class BetsService {
   }
 
   async acceptBet(id: number, acceptorEmail: string) {
+    console.log(id);
     const bet = await this.betsRepository.findOne({
       where: { id },
       relations: { acceptedBy: true },

@@ -35,3 +35,6 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 *.env
+result*.json
+apiRead.js
+apiTest.js

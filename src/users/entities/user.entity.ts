@@ -21,6 +21,6 @@ export class User {
   @OneToMany(() => Bet, (bet) => bet.acceptedBy)
   betsAccepted: Bet[];
 
-  @Column({ nullable: true, default: 100 })
+  @Column({ type: 'double precision', nullable: true, default: 100 })
   points: number;
 }
