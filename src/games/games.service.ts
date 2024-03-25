@@ -109,6 +109,7 @@ export class GamesService {
     }
 
     if (games.length != 0) {
+      console.log('api call')
       const date = format(new Date(), 'd/M/yyyy');
       const url = `https://basketapi1.p.rapidapi.com/api/basketball/matches/${date}`;
       const key = this.configService.get('RAPIDAPI_KEY');
