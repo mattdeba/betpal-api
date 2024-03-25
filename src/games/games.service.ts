@@ -75,7 +75,7 @@ export class GamesService {
           homeTeam: game.homeTeam.nameCode,
           awayTeam: game.awayTeam.nameCode,
           dateTimeUTC: new Date(game.startTimestamp * 1000).toISOString(),
-          isClosed: game.IsClosed,
+          isClosed: game.status.type == 'finished',
           homeTeamScore: game.homeScore?.current || null,
           awayTeamScore: game.awayScore?.current || null,
         });
@@ -89,7 +89,7 @@ export class GamesService {
   })
   async updateScores(options = { updateAllGames: false }) {
     const { updateAllGames } = options;
-    let games: any;
+    let games = [];
 
     if (updateAllGames === true) {
       games = await this.gamesRepository.find({
@@ -108,24 +108,28 @@ export class GamesService {
       });
     }
 
-    for (const game of games) {
-      const res = await this.httpService.axiosRef.get(
-        `https://api.sportsdata.io/v3/nba/pbp/json/PlayByPlay/${game.gameId}`,
-        {
-          headers: {
-            'Ocp-Apim-Subscription-Key':
-              this.configService.get('SUBSCRIPTION_KEY'),
-          },
+    if (games.length != 0) {
+      const date = format(new Date(), 'd/M/yyyy');
+      const url = `https://basketapi1.p.rapidapi.com/api/basketball/matches/${date}`;
+      const key = this.configService.get('RAPIDAPI_KEY');
+      const res = await this.httpService.axiosRef.get(url, {
+        headers: {
+          'X-RapidAPI-Key': key,
+          'X-RapidAPI-Host': 'basketapi1.p.rapidapi.com',
         },
+      });
+      const gamesFromApi = res.data.events.filter(
+        (event) => event.tournament.slug === 'nba',
       );
+      for (const game of games) {
+        const gameFromApi = gamesFromApi.find((g) => g.id === game.gameId);
+        game.homeTeamScore = gameFromApi.homeScore?.current || null;
+        game.awayTeamScore = gameFromApi.awayScore?.current || null;
+        game.gameStatus = gameFromApi.status.type;
+        game.isClosed = gameFromApi.status.type == 'finished';
 
-      const gameFromApi = res.data.Game;
-      game.homeTeamScore = gameFromApi.HomeTeamScore;
-      game.awayTeamScore = gameFromApi.AwayTeamScore;
-      game.gameStatus = gameFromApi.Status;
-      game.isClosed = gameFromApi.IsClosed;
-
-      await this.gamesRepository.save(game);
+        await this.gamesRepository.save(game);
+      }
     }
   }
 }
