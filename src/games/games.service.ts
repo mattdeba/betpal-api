@@ -3,7 +3,7 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './entities/game.entity';
-import { Between, Not, Repository } from 'typeorm';
+import { Between, LessThan, Not, Repository } from "typeorm";
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -99,10 +99,10 @@ export class GamesService {
       });
     } else {
       const now = new Date();
-      const threeHoursBefore = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+      const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
       games = await this.gamesRepository.find({
         where: {
-          dateTimeUTC: Between(threeHoursBefore, now),
+          dateTimeUTC: LessThan(threeHoursAgo),
           isClosed: Not(true),
         },
       });
