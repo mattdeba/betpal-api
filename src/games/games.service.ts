@@ -3,11 +3,12 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './entities/game.entity';
-import { Between, LessThan, Not, Repository } from 'typeorm';
+import { LessThan, Not, Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { format } from 'date-fns';
+import { BetsService } from '../bets/bets.service';
 
 @Injectable()
 export class GamesService {
@@ -16,6 +17,7 @@ export class GamesService {
     private gamesRepository: Repository<Game>,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly betsService: BetsService,
   ) {}
 
   async create(createGameDto: CreateGameDto) {
@@ -129,6 +131,7 @@ export class GamesService {
         game.isClosed = gameFromApi.status.type == 'finished';
 
         await this.gamesRepository.save(game);
+        await this.betsService.assertBetsFromGame(game.id);
       }
     }
   }

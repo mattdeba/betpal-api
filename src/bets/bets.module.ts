@@ -12,6 +12,7 @@ import { Game } from '../games/entities/game.entity';
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Game]),
   ],
+  exports: [BetsService],
   controllers: [BetsController],
   providers: [BetsService],
 })

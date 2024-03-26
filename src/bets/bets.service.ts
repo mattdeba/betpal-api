@@ -168,16 +168,20 @@ export class BetsService {
     });
     const betsClosed = [];
     for (const bet of bets) {
-      const betIsCorrect = bet.homeTeamWinner === gameWinnerIsHomeTeam;
+      try {
+        const betIsCorrect = bet.homeTeamWinner === gameWinnerIsHomeTeam;
 
-      await this.betsRepository.update(bet.id, {
-        assertionCorrect: betIsCorrect,
-      });
-      const closedBet = await this.closeBet(bet.id);
-      if (closedBet) {
-        betsClosed.push(closedBet);
+        await this.betsRepository.update(bet.id, {
+          assertionCorrect: betIsCorrect,
+        });
+        const closedBet = await this.closeBet(bet.id);
+        if (closedBet) {
+          betsClosed.push(closedBet);
+        }
+        return betsClosed;
+      } catch (error) {
+        console.error(error);
       }
-      return betsClosed;
     }
   }
 
@@ -187,7 +191,7 @@ export class BetsService {
       relations: { acceptedBy: true, createdBy: true },
     });
     if (bet.closed) {
-      throw new HttpException('Bet already closed', 400)
+      throw new HttpException('Bet already closed', 400);
     }
     if (!bet) {
       throw new HttpException('Bet not found', 404);
