@@ -118,7 +118,6 @@ export class BetsService {
   }
 
   async acceptBet(id: number, acceptorEmail: string) {
-    console.log(id);
     const bet = await this.betsRepository.findOne({
       where: { id },
       relations: { acceptedBy: true },
@@ -149,6 +148,31 @@ export class BetsService {
     return this.betsRepository.update(id, {
       assertionCorrect,
     });
+  }
+
+  async assertBetsFromGame(gameId: number) {
+    const game = await this.gamesRepository.findOne({ where: { id: gameId } });
+
+    if (!game || game.gameStatus !== 'finished') {
+      return;
+    }
+
+    const gameWinnerIsHomeTeam = game.homeTeamScore > game.awayTeamScore;
+
+    const bets = await this.betsRepository.find({
+      where: {
+        game: {
+          id: gameId,
+        },
+      },
+    });
+    for (const bet of bets) {
+      const betIsCorrect = bet.homeTeamWinner === gameWinnerIsHomeTeam;
+
+      await this.betsRepository.update(bet.id, {
+        assertionCorrect: betIsCorrect,
+      });
+    }
   }
 
   async closeBet(id: number) {

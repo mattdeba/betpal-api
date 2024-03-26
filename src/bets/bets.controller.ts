@@ -56,6 +56,11 @@ export class BetsController {
     return await this.betsService.assertBet(+id, assertionDto.assertionCorrect);
   }
 
+  @Post('assertByGame/:gameId')
+  async assertBetsFromGame(@Param('gameId') gameId: string) {
+    return this.betsService.assertBetsFromGame(+gameId);
+  }
+
   @Post(':id/close')
   async closeBet(@Param('id') id: string) {
     return await this.betsService.closeBet(+id);

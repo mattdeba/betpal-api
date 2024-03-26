@@ -3,7 +3,7 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './entities/game.entity';
-import { Between, LessThan, Not, Repository } from "typeorm";
+import { Between, LessThan, Not, Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -109,7 +109,6 @@ export class GamesService {
     }
 
     if (games.length != 0) {
-      console.log('api call')
       const date = format(new Date(), 'd/M/yyyy');
       const url = `https://basketapi1.p.rapidapi.com/api/basketball/matches/${date}`;
       const key = this.configService.get('RAPIDAPI_KEY');
