@@ -50,6 +50,7 @@ export class BetsService {
       relations: {
         createdBy: true,
         acceptedBy: true,
+        game: true,
       },
     });
   }
@@ -64,6 +65,7 @@ export class BetsService {
         { firstName },
       )
       .leftJoinAndSelect('bet.acceptedBy', 'acceptedBy')
+      .leftJoinAndSelect('bet.game', 'game')
       .getMany();
   }
 
